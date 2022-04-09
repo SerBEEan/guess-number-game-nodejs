@@ -1,25 +1,27 @@
 'use strict';
 
 const net = require('net');
+const { rand, checkGuessNumber, checkCorrectCommand } = require('../utils');
 
 const PORT = 3000;
-
-const rand = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min; //Максимум и минимум включаются
-}
 
 let NUMBER = rand(0, 100);
 
 const connection = (socket) => {
     socket.on('data', (data) => {
-        const guess = Number(data.toString());
-        if (guess > NUMBER) {
-            socket.write('less');
-        } else if (guess < NUMBER) {
-            socket.write('more');
+        const value = checkCorrectCommand(data.toString());
+
+        if (typeof value === 'string') {
+            socket.write(value);
         } else {
-            socket.write('correct!\nnew value is set');
-            NUMBER = rand(0, 100);
+            const resultMsg = checkGuessNumber(NUMBER, value);
+
+            if (resultMsg === 'correct!') {
+                socket.write(`${resultMsg}\nnew value is set`);
+                NUMBER = rand(0, 100);
+            } else {
+                socket.write(resultMsg);
+            }
         }
     });
 

@@ -19,21 +19,8 @@ socket.on('error', (err) => {
 });
 
 socket.on('connect', () => {
-    const command = process.argv[2];
-    if (command !== 'guess') {
-        console.log('enter the correct command');
-        socket.end();
-        return ;
-    }
-
-    const value = process.argv[3];
-    if (Number.isNaN(Number(value))) {
-        console.log('the value of the "guess" command is a number');
-        socket.end();
-        return ;
-    }
-
-    send(value);
+    const request = process.argv.slice(2).join(' ');    // 0 и 1 - данные кто вызывает и что вызывает
+    send(request === '' ? ' ' : request);
 });
 
 socket.connect({ port: PORT, host: '127.0.0.1' });
